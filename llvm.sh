@@ -15,6 +15,8 @@ llvmws(){
   mkdir -p $MYTEMPDIR
 }
 
+alias cd86='cd ${MYLLVMWS}/llvm/lib/Target/X86/'
+
 llvm_check_ws(){
     if [[ -z "${MYLLVMWS}" ]]; then
         echo 0
