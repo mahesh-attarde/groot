@@ -2,15 +2,16 @@
 export EDITOR=vim
 export VISUAL=gvim
 alias g='gvim'
+export MYED=code
 
 # Editor
-e()  { code $1; }
-el() { code llvm/$1; }
-ef() { find . -name $1 | xargs code ;}
-elf() { find llvm -name $1 | xargs code; }
-edif(){ code --diff $1 $2; }
-ezrpt(){ code ./zperf_rt_rpt.log; }
-efzrpt() { find . -name zperf_rt_rpt.log | xargs code ;}
+e()  { $MYED $1; }
+el() { $MYED llvm/$1; }
+ef() { find . -name $1 | xargs $MYED ;}
+elf() { find llvm -name $1 | xargs $MYED; }
+edif(){ $MYED --diff $1 $2; }
+ezrpt(){ $MYED ./zperf_rt_rpt.log; }
+efzrpt() { find . -name zperf_rt_rpt.log | xargs $MYED ;}
 
 ezlf(){
     find_and_edcode lf
@@ -34,7 +35,7 @@ find_and_edcode() {
         if [ -n "$file" ]; then
             read -p "You selected '$file'. Press Enter to open or type 'n' to abort: " confirm
             if [ "$confirm" != "n" ]; then
-                code "$file"
+                $MYED "$file"
             else
                 echo "Operation canceled."
             fi
@@ -47,8 +48,6 @@ find_and_edcode() {
     # Restore the terminal state explicitly (in case trap didn't trigger)
     stty "$saved_state"
 }
-
-
 
 
 # Change dir
