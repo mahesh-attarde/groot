@@ -1,0 +1,2 @@
+bashrc $GROOT/bashrc visible
+BUGGY /bug/bug/bug hidden

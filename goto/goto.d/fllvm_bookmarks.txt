@@ -1,0 +1,7 @@
+X86.td $MYLLVMWS/llvm/lib/Target/X86/X86.td  visible
+X86ISelDAGToDAG.cpp $MYLLVMWS/llvm/lib/Target/X86/X86ISelDAGToDAG.cpp visible
+X86ISelLowering.cpp $MYLLVMWS/llvm/lib/Target/X86/X86ISelLowering.cpp visible
+X86InstrAVX512.td $MYLLVMWS/llvm/lib/Target/X86/X86InstrAVX512.td visible
+X86InstrAVX10.td $MYLLVMWS/llvm/lib/Target/X86/X86InstrAVX10.td visible
+X86InstrFormats.td $MYLLVMWS/llvm/lib/Target/X86/X86InstrFormats.td visible
+BUGGY /bug/bug/bug hidden

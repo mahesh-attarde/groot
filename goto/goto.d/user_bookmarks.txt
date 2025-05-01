@@ -1,0 +1,5 @@
+GOTOHOME  $GROOT/goto visible
+WSDRIVE $MYWSROOT  visible
+TESTSPACE $MYWSROOT/test visible 
+WSTOOLS $MYWSROOT/wstools visible
+BUGGY /bug/bug/bug hidden

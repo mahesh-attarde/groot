@@ -1,0 +1,7 @@
+Target86 $MYLLVMWS/llvm/lib/Target/X86/  visible
+CodeGen86 $MYLLVMWS/llvm/test/CodeGen/X86/ visible
+GISEL86 $MYLLVMWS/llvm/lib/Target/X86/GISel/ visible
+GISEL  $MYLLVMWS/llvm/lib/CodeGen/GlobalISel/ visible
+Header $MYLLVMWS/clang/lib/Headers/ visible
+DISX86 $MYLLVMWS/test/MC/Disassembler/X86/ visible
+BUGGY /bug/bug/bug hidden
