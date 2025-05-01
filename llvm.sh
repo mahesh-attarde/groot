@@ -15,6 +15,7 @@ llvmws(){
   mkdir -p $MYTEMPDIR
 }
 
+alias cdll='cd ${MYLLVMWS}/llvm/'
 alias cd86='cd ${MYLLVMWS}/llvm/lib/Target/X86/'
 
 llvm_check_ws(){
@@ -108,6 +109,15 @@ lvcl() {
     ninja check-llvm
 }
 
+lvmkclean() {
+    env_set=$(llvm_check_ws)
+    if [[ "$env_set" != "1" ]]; then
+        echo "llvm-ws not set!"
+        return
+    fi
+    cd $MYLLVMWS/build
+    ninja clean
+}
 # Testing
 llit() {
     test_prefix=$1

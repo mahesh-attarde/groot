@@ -1,8 +1,8 @@
 # Set the default editor
 export EDITOR=vim
 export VISUAL=gvim
-alias g='gvim'
 export MYED=code
+alias g='gvim'
 
 # Editor
 e()  { $MYED $1; }
@@ -77,10 +77,9 @@ alias ll='ls -Fls' # long listing format
 alias labc='ls -lap' #alphabetical sort
 alias lf="ls -l | egrep -v '^d'" # files only
 alias ldir="ls -l | egrep '^d'" # directories only
-
-# 
-alias disasm="objdump -D --no-show-raw-insn --no-addresses"
 alias scd='pushd $PWD'
+alias ppd='popd'
+#alias disasm="objdump -D --no-show-raw-insn --no-addresses"
 
 # Search command line history
 alias h="history | grep "
@@ -101,3 +100,11 @@ alias mountedinfo='df -hT'
 alias ff='find . -name'
 gtp()  {   readlink -f $1 ;}
 ffgtp(){ find . -name $1 | xargs readlink -f ; }
+
+
+
+## Source Other Scripts
+alias llrc='source ${GROOT}/llvm.sh'
+alias icsrc='source ${GROOT}/izx.sh'
+alias gtrc='source ${GROOT}/goto/goto.sh'
+alias dbrc='source ${GROOT}/compiler_debug.sh'
