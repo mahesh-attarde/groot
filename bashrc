@@ -1,8 +1,17 @@
+# For ENV 
+source ${GROOT}/grootrc
+# For Color and PS1
+source ${GROOT}/color.sh
+
 # Set the default editor
 export EDITOR=vim
 export VISUAL=gvim
 export MYED=code
 alias g='gvim'
+
+setvscode() {
+    export PATH=${VSCODE_GIT_ASKPASS_NODE%/*}/bin/remote-cli:$PATH
+}
 
 # Editor
 e()  { $MYED $1; }
@@ -89,6 +98,7 @@ alias topcpu="/bin/ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10"
 # Search files in the current folder
 alias f="find . | grep "
 # Alias's to show disk space and space used in a folder
+alias csize='du -h --max-depth=1 | sort -hr'
 alias diskspace="du -S | sort -n -r |more"
 alias folders='du -h --max-depth=1'
 alias folderssort='find . -maxdepth 1 -type d -print0 | xargs -0 du -sk | sort -rn'
@@ -98,12 +108,16 @@ alias mountedinfo='df -hT'
 
 # Get Path
 alias ff='find . -name'
-gtp()  {   readlink -f $1 ;}
+
+mkcd() { mkdir -p "$@" && cd "$@"; }
+gtp()  { readlink -f $1 ;}
 ffgtp(){ find . -name $1 | xargs readlink -f ; }
 
 
 
 ## Source Other Scripts
+alias edrc='source ${GROOT}/bashrc'
+alias ldrc='source ${GROOT}/bashrc'
 alias llrc='source ${GROOT}/llvm.sh'
 alias icsrc='source ${GROOT}/izx.sh'
 alias gtrc='source ${GROOT}/goto/goto.sh'

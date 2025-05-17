@@ -15,6 +15,7 @@ llvmws(){
   mkdir -p $MYTEMPDIR
 }
 
+alias cdws='cd $MYLLVMWS'
 alias cdll='cd ${MYLLVMWS}/llvm/'
 alias cd86='cd ${MYLLVMWS}/llvm/lib/Target/X86/'
 
@@ -141,6 +142,10 @@ clit() {
     fi
     $LLVMWSBIN/llvm-lit $LLVMWSWS/clang/test/${test_prefix} $options &> $MYTEMPDIR/clit.log
     code $MYTEMPDIR/clit.log
+}
+
+lvformat() {
+ $MYLLVMWS/clang/tools/clang-format/git-clang-format --binary=$MYLLVMBIN/clang-format HEAD
 }
 
 # Update Test

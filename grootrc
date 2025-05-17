@@ -1,0 +1,10 @@
+cuser=$(whoami)
+export MYWSROOT=/iusers/$cuser
+export MYTESTROOT=$MYWSROOT/test/
+export WSTOOL=$MYWSROOT/wstool/
+export MYWSTEMP=$MYWSROOT/temp/
+export tfile=$MYWSTEMP/t.txt
+# jyputer
+export PATH=$HOME/.local/bin:$PATH
+# servethis python
+export PYTHONPATH=$PYTHONPATH:$WSTOOL/uploadserver-5.2.2/
