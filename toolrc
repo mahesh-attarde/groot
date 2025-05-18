@@ -1,0 +1,56 @@
+# gdb
+alias gdba='gdb -q --args'
+
+# Objdump 
+objdump_func(){
+    objdump -d $1
+}
+
+disasm(){
+    objdump -D --no-show-raw-insn --no-addresses -DM intel $@
+}
+
+# nm
+# strings
+
+# Tar 
+pack(){
+    tarfile=`basename $1`
+    tar -cf $tarfile $1
+}
+packz(){
+    tarfile=`basename $1`
+    tar -czf $tarfile $1
+}
+unpack(){
+    tarfile=$1
+    tar -xf $tarfile
+}
+
+# Dot 
+dot()   {
+    dot -Tpng $1 -o $2
+} 
+
+# Upload 
+alias servethis='python3 -m http.server -d $PWD'
+alias uploadhere='python3 -m uploadserver'
+pytools(){
+    if [[ ! -d "${WSTOOL}/uploadserver-5.2.2" ]]; then
+        pushd $PWD
+        mkdir -p $WSTOOL
+        cd $WSTOOL        
+        wget https://files.pythonhosted.org/packages/2f/98/e3f1a95c0b5f995d44b840569df16256e3a606e240ea51baed310c829ad1/uploadserver-5.2.2.tar.gz 
+        tar -xf uploadserver-5.2.2.tar.gz
+        popd 
+    fi
+}
+
+gdotfiles(){
+    if [[ ! -d "${WSTOOL}/dotfiles" ]]; then
+        pushd $PWD
+        mkdir -p $WSTOOL
+        cd $WSTOOL        
+        git clone https://github.com/mahesh-attarde/dotfiles.git
+    fi
+}

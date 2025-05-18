@@ -2,7 +2,8 @@
 source ${GROOT}/grootrc
 # For Color and PS1
 source ${GROOT}/color.sh
-
+# For Binutils and other tools
+source ${GROOT}/toolrc
 # Set the default editor
 export EDITOR=vim
 export VISUAL=gvim
@@ -21,7 +22,7 @@ elf() { find llvm -name $1 | xargs $MYED; }
 edif(){ $MYED --diff $1 $2; }
 ezrpt(){ $MYED ./zperf_rt_rpt.log; }
 efzrpt() { find . -name zperf_rt_rpt.log | xargs $MYED ;}
-
+efb() { find . -name build.log | xargs $MYED ;}
 ezlf(){
     find_and_edcode lf
 }
