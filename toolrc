@@ -35,18 +35,24 @@ dot()   {
 # Upload 
 alias servethis='python3 -m http.server -d $PWD'
 alias uploadhere='python3 -m uploadserver'
-pytools(){
-    if [[ ! -d "${WSTOOL}/uploadserver-5.2.2" ]]; then
-        pushd $PWD
-        mkdir -p $WSTOOL
-        cd $WSTOOL        
+dltools(){
+    pushd $PWD
+    mkdir -p $WSTOOL
+    cd $WSTOOL
+    if [[ ! -d "${WSTOOL}/uploadserver-5.2.2" ]]; then      
         wget https://files.pythonhosted.org/packages/2f/98/e3f1a95c0b5f995d44b840569df16256e3a606e240ea51baed310c829ad1/uploadserver-5.2.2.tar.gz 
         tar -xf uploadserver-5.2.2.tar.gz
-        popd 
     fi
+    if [[ ! -d "${WSTOOL}/cpuid-20250513" ]]; then
+        wget https://www.etallen.com/cpuid/cpuid-20250513.src.tar.gz
+        tar -xf cpuid-20250513.src.tar.gz
+        cd cpuid-20250513
+        make
+    fi
+    popd 
 }
 
-gdotfiles(){
+dldot(){
     if [[ ! -d "${WSTOOL}/dotfiles" ]]; then
         pushd $PWD
         mkdir -p $WSTOOL

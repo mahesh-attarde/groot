@@ -76,3 +76,7 @@ git_search_grep_user() {
  git log --grep=$usermention
 }
 
+## Git files
+git_test_files() {
+    git show --name-only $1  | grep "/test/"
+}
