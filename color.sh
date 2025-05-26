@@ -27,3 +27,8 @@ if [ "$color_prompt" = yes ]; then
     unset sshbg rootcol hashcol
 fi
 unset color_prompt force_color_prompt
+
+prompt_less(){
+    export PS1="\[$(tput sgr0)\]\[\033[38;5;4m\]${sshbg}\h\[$(tput sgr0)\]\[$(tput sgr0)\]\[\033[38;5;6m\]\[$(tput sgr0)\]${hashcol}\\$ \[$(tput sgr0)\] \n"
+
+}
