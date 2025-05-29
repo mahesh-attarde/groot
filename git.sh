@@ -77,6 +77,14 @@ git_search_grep_user() {
 }
 
 ## Git files
+git_add_ccpp_files(){
+    git diff-index --name-only @ -- \*.cpp | xargs git add
+    git diff-index --name-only @ -- \*.c | xargs git add
+    git diff-index --name-only @ -- \*.h | xargs git add
+}
+git_files_in_commit() {
+    git show --name-only $1 | grep -v "^$" | grep -v "^commit" | grep -v "^Author:" | grep -v "^Date:"
+}
 git_test_files() {
     git show --name-only $1  | grep "/test/"
 }
