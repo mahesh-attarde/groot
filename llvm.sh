@@ -66,6 +66,10 @@ lvconfig() {
         echo "llvm-ws not set!"
         return
     fi
+    EXTRA_CONF=""
+    if [[ "$1" == "llvm-exegenis" ]]; then
+      EXTRA_CONF=-DLLVM_ENABLE_LIBPFM=ON
+    fi
     echo "Configuring LLVM..."
     cd $MYLLVMWS
     mkdir -p build 
@@ -76,6 +80,7 @@ lvconfig() {
         -DLLVM_ENABLE_PROJECTS="clang" \
         -DCMAKE_BUILD_TYPE=Debug \
         -DLLVM_OPTIMIZED_TABLEGEN=OFF \
+        $EXTRA_CONF \
         -DCMAKE_INSTALL_PREFIX=$PWD/install
 }
 

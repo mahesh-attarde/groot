@@ -8,6 +8,7 @@
 # Keep BUGGY Line in Bookmark file.
 # Export MYED=code or vim 
 # Export MYSCRIPTHOME=GROOT Repo
+export MYSCRIPTHOME=$GROOT
 export MYGOTOHOME=$MYSCRIPTHOME/goto/goto.d
 ################################################################################
 export fbookmark_file=
