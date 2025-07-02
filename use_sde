@@ -1,0 +1,3 @@
+#!  /bin/bash
+# Tool to print know usecases of tool
+echo "sde -debugtrace -dt_filter_start=0x40a858 -dt_filter_stop=0x40a8c5 -- app.exe"
