@@ -68,7 +68,7 @@ lvconfig() {
     fi
     EXTRA_CONF=""
     if [[ "$1" == "llvm-exegenis" ]]; then
-      EXTRA_CONF=-DLLVM_ENABLE_LIBPFM=ON
+      EXTRA_CONF=-DLLVM_ENABLE_LIBPFM=ON 
     fi
     echo "Configuring LLVM..."
     cd $MYLLVMWS
@@ -81,6 +81,26 @@ lvconfig() {
         -DCMAKE_BUILD_TYPE=Debug \
         -DLLVM_OPTIMIZED_TABLEGEN=OFF \
         $EXTRA_CONF \
+        -DCMAKE_INSTALL_PREFIX=$PWD/install
+        
+}
+lvconfig_sp(){
+    env_set=$(llvm_check_ws)
+    if [[ "$env_set" != "1" ]]; then
+        echo "llvm-ws not set!"
+        return
+    fi
+    echo "Configuring LLVM WITH SPECIAL..."
+    cd $MYLLVMWS
+    mkdir -p build 
+    cd build
+    cmake -S ../llvm -G Ninja \
+        -DLLVM_TARGETS_TO_BUILD=X86 \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DLLVM_ENABLE_PROJECTS="clang" \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DLLVM_OPTIMIZED_TABLEGEN=OFF \
+        -DLLVM_ENABLE_LIBPFM=ON  \
         -DCMAKE_INSTALL_PREFIX=$PWD/install
 }
 

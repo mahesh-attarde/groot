@@ -43,7 +43,7 @@ open_editor() {
     local efile=$1
     fpath=$(eval echo "${efile}")
     if [[ -f "${fpath}" ]]; then
-        $EDITOR "${fpath}"
+        $MYED "${fpath}"
         echo "Opening file ${efile}"
     else
         echo "Error: Failed to open '${efile}'."
