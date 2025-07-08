@@ -1,0 +1,4 @@
+#! /bin/bash
+func=$1
+biny=$2
+objdump --no-show-raw-ins -C -M intel --disassemble="$func" $biny  --visualize-jumps=color
