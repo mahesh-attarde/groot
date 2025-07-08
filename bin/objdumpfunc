@@ -1,0 +1,6 @@
+#! /bin/bash
+# objdumpfunc main exe
+# https://man7.org/linux/man-pages/man1/objdump.1.html
+func=$1
+biny=$2
+objdump --no-show-raw-ins -C -M intel --disassemble="$func" $biny
