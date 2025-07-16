@@ -1,8 +1,4 @@
 #! /bin/bash
 
 # lit_clean ll_file  prefix
-python3 $GROOT/pyscripts/stringutils_rm_prefix.py \
-    $1   \
-    ";"  \
-    "$2" \
-    -o $1
+python3 $GROOT/pyscripts/stringutils_rm_prefix.py  $1 ";" "$2" -o $1 --del_empty_lines
