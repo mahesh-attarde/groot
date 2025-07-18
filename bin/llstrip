@@ -1,0 +1,8 @@
+#! /bin/bash
+tool=opt
+if ! command -v $tool &> /dev/null; then
+    echo "Error: '$tool' tool not found in PATH"
+    echo "Please ensure LLVM is installed and $tool is in your PATH"
+fi
+echo "Using Tool From: $(which $tool)"
+$tool -S -strip-debug "$1" "${@:2}" -o "$1.stripll"
