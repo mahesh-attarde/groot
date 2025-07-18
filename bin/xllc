@@ -1,0 +1,8 @@
+#! /bin/bash
+tool=llc
+if ! command -v $tool &> /dev/null; then
+    echo "Error: '$tool' tool not found in PATH"
+    echo "Please ensure LLVM is installed and $tool is in your PATH"
+fi
+echo "Using Tool From: $(which $tool)"
+$tool -mtriple=x86_64-unknown-unknown --x86-asm-syntax=intel "$1" "${@:2}" 
