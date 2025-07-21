@@ -49,6 +49,12 @@ dltools(){
         cd cpuid-20250513
         make
     fi
+    if [[ ! -d "${WSTOOL}/cpuid-20250513" ]]; then
+        wget https://github.com/Wilfred/difftastic/releases/download/0.64.0/difft-x86_64-unknown-linux-gnu.tar.gz
+        tar -xf difft-x86_64-unknown-linux-gnu.tar.gz
+        mkdir -p $WSTOOL/bin
+        cp difft $WSTOOL/bin/
+    fi
     popd 
 }
 
