@@ -1,0 +1,3 @@
+#! /bin/bash
+echo rsync -avhe ssh --progress --update $1 $2
+rsync -avhe ssh --progress --update $1 $2
