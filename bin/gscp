@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Usage: ./script.sh <target_address> -d <destination_path> <file1> [file2] [file3] ...
+# Example: ./script.sh server.example.com -d /tmp/uploads/ file1.txt file2.log /path/to/file3.dat
+
+GSCP_TARGET_ADDRESS=$1
+GSCP_TARGET_USER=root
+GSCP_TMP_DIR=$(mktemp -d)
+GSCP_SSH_CFG=$GSCP_TMP_DIR/ssh-cfg
+GSCP_SSH_SOCKET=$GSCP_TMP_DIR/ssh-socket
+
+# Parse command line arguments
+if [[ $# -lt 4 ]]; then
+    echo "Error: Insufficient arguments."
+    echo "Usage: $0 <target_address> -d <destination_path> <file1> [file2] [file3] ..."
+    exit 1
+fi
+
+if [[ "$2" != "-d" ]]; then
+    echo "Error: Missing mandatory -d option for destination."
+    echo "Usage: $0 <target_address> -d <destination_path> <file1> [file2] [file3] ..."
+    exit 1
+fi
+
+GSCP_TARGET_PATH=$3
+shift 3  # Remove first 3 arguments (address, -d, destination)
+GSCP_SOURCE_FILES=("$@")  # Remaining arguments are source files
+
+# Validate source files exist
+for GSCP_file in "${GSCP_SOURCE_FILES[@]}"; do
+    if [[ ! -f "$GSCP_file" ]]; then
+        echo "Error: Source file '$GSCP_file' not found."
+        exit 1
+    fi
+done
+
+# Create a temporary SSH config file:
+cat > "$GSCP_SSH_CFG" <<ENDCFG
+Host *
+        ControlMaster auto
+        ControlPath $GSCP_SSH_SOCKET
+ENDCFG
+
+# Open a SSH tunnel:
+ssh -F "$GSCP_SSH_CFG" -f -N -l $GSCP_TARGET_USER $GSCP_TARGET_ADDRESS
+
+# Wait a moment for the connection to establish
+sleep 1
+
+# Check if the control master connection is working
+if ! ssh -F "$GSCP_SSH_CFG" -O check $GSCP_TARGET_ADDRESS 2>/dev/null; then
+    echo "Error: Failed to establish SSH connection to $GSCP_TARGET_ADDRESS"
+    rm -rf "$GSCP_TMP_DIR"
+    exit 1
+fi
+
+echo "SSH tunnel established successfully."
+
+# Upload each file:
+for GSCP_HOST_PATH in "${GSCP_SOURCE_FILES[@]}"; do
+    GSCP_filename=$(basename "$GSCP_HOST_PATH")
+    echo "Copying '$GSCP_HOST_PATH' to '$GSCP_TARGET_PATH$GSCP_filename'..."
+    
+    if scp -F "$GSCP_SSH_CFG" "$GSCP_HOST_PATH" $GSCP_TARGET_USER@$GSCP_TARGET_ADDRESS:"$GSCP_TARGET_PATH$GSCP_filename"; then
+        echo "Successfully copied '$GSCP_HOST_PATH' to '$GSCP_TARGET_PATH$GSCP_filename'"
+    else
+        echo "Error: Failed to copy '$GSCP_HOST_PATH' to '$GSCP_TARGET_PATH$GSCP_filename'"
+    fi
+done
+
+# Run SSH commands:
+ssh -F "$GSCP_SSH_CFG" $GSCP_TARGET_USER@$GSCP_TARGET_ADDRESS -T <<ENDSSH
+echo "All file transfers completed to $GSCP_TARGET_PATH"
+# Add any post-processing commands here
+ENDSSH
+
+# Close the SSH tunnel:
+ssh -F "$GSCP_SSH_CFG" -S "$GSCP_SSH_SOCKET" -O exit "$GSCP_TARGET_ADDRESS"
+
+# Clean up temporary directory
+rm -rf "$GSCP_TMP_DIR"
+
+# Unset all script variables to avoid environment pollution
+unset GSCP_TARGET_ADDRESS GSCP_TARGET_USER GSCP_TMP_DIR GSCP_SSH_CFG GSCP_SSH_SOCKET
+unset GSCP_TARGET_PATH GSCP_SOURCE_FILES GSCP_file GSCP_HOST_PATH GSCP_filename
+
+echo "All operations completed and SSH tunnel closed."
