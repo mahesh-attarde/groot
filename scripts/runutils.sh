@@ -31,3 +31,17 @@ for line in $(cat $rfile); do
   $app $line 
 done
 }
+
+# runutils_foralldirs_cmd "ls -ltr | grep llvm &> log"
+runutils_foralldirs_cmd()
+{
+for dir in */; do
+    if [ -d "$dir" ]; then
+        dirname="${dir%/}" 
+        cd "$dir" || continue
+        echo "$dirname"
+        eval "$1"
+        cd ..
+    fi
+done
+}
