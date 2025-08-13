@@ -91,6 +91,9 @@ alias lf="ls -l | egrep -v '^d'" # files only
 alias ldir="ls -l | egrep '^d'" # directories only
 alias scd='pushd $PWD'
 alias ppd='popd'
+
+function lsgrep(){     ls | grep $1 ;  }
+
 #alias disasm="objdump -D --no-show-raw-insn --no-addresses"
 
 # Search command line history
