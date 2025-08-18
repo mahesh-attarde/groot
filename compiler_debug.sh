@@ -36,6 +36,10 @@ llc_log(){
     preprocess_llc_debug llc.log
 }
 
+llc_print(){
+    llc --print-after-all $@ 2>&1 | tee llc.print
+}
+
 # llvm/utils/gdb-scripts/prettyprinters.py
 dllc(){
     if  [ -f "bk.pt" ]; then

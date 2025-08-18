@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Usage: ./extract_func.sh <binary> <function_name>
+# Example: ./extract_func.sh main.out myfunc
+
+if [[ $# -ne 2 ]]; then
+  echo "Usage: $0 <binary> <function_name>"
+  exit 1
+fi
+
+binary="$1"
+func="$2"
+
+objdump -d "$binary" | awk -v RS= "/^[[:xdigit:]]+ <$func>/"
