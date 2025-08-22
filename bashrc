@@ -93,6 +93,7 @@ alias scd='pushd $PWD'
 alias ppd='popd'
 
 function lsgrep(){     ls | grep $1 ;  }
+alias mrg='rg --no-heading --line-number'
 
 #alias disasm="objdump -D --no-show-raw-insn --no-addresses"
 

@@ -6,5 +6,6 @@ export MYWSTEMP=$MYWSROOT/temp/
 export tfile=$MYWSTEMP/t.txt
 # jyputer
 export PATH=$HOME/.local/bin:$PATH
+export PATH=$PATH:$WSTOOL/bin
 # servethis python
 export PYTHONPATH=$PYTHONPATH:$WSTOOL/uploadserver-5.2.2/

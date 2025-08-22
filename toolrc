@@ -58,11 +58,62 @@ dltools(){
     popd 
 }
 
-dldot(){
-    if [[ ! -d "${WSTOOL}/dotfiles" ]]; then
-        pushd $PWD
-        mkdir -p $WSTOOL
-        cd $WSTOOL        
-        git clone https://github.com/mahesh-attarde/dotfiles.git
-    fi
+# dldot(){
+#     if [[ ! -d "${WSTOOL}/dotfiles" ]]; then
+#         pushd $PWD
+#         mkdir -p $WSTOOL
+#         cd $WSTOOL        
+#         git clone https://github.com/mahesh-attarde/dotfiles.git
+#     fi
+# }
+
+dlmodernlinux() {
+    # Make sure the bin directory exists
+    mkdir -p "$WSTOOL/bin"
+    
+    # Define tools: name, URL, binary pattern to find
+    tools=(
+        "bat|https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-x86_64-unknown-linux-gnu.tar.gz|bat"
+        "eza|https://github.com/eza-community/eza/releases/download/v0.23.0/eza_x86_64-unknown-linux-gnu.tar.gz|eza"
+        "delta|https://github.com/dandavison/delta/releases/download/0.18.2/delta-0.18.2-x86_64-unknown-linux-gnu.tar.gz|delta"
+        "duf|https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_x86_64.tar.gz|duf"
+        "fd|https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-gnu.tar.gz|fd"
+        "rg|https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-unknown-linux-musl.tar.gz|rg"
+
+    )
+    
+    for tool_info in "${tools[@]}"; do
+        # Parse the tool info using | as delimiter
+        IFS="|" read -r tool url binary_pattern <<< "$tool_info"
+        
+        if [[ ! -f "$WSTOOL/bin/$tool" ]]; then
+            echo "Installing $tool..."
+            
+            tarfile=$(basename "$url")
+            temp_dir=$(mktemp -d)
+            
+            # Download the tarball
+            wget "$url"
+            
+            # Extract to temp directory
+            tar -xf "$tarfile" -C "$temp_dir"
+            
+            # Find the binary in the extracted files
+            binary_path=$(find "$temp_dir" -type f -name "$binary_pattern" | head -1)
+            
+            if [[ -n "$binary_path" ]]; then
+                cp "$binary_path" "$WSTOOL/bin/$tool"
+                chmod +x "$WSTOOL/bin/$tool"
+                echo "$tool installed to $WSTOOL/bin/$tool"
+            else
+                echo "Error: Could not find binary '$binary_pattern' for $tool"
+            fi
+            
+            # Clean up
+            rm -f "$tarfile"
+            rm -rf "$temp_dir"
+        else
+            echo "$tool is already installed."
+        fi
+    done
 }
