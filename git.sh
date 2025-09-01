@@ -11,6 +11,9 @@ gitrst(){
     git restore $@
 }
 
+gits(){
+    git status $@
+}
 
 # Git Difference
 gitdif(){
