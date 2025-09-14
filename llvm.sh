@@ -180,12 +180,36 @@ update_llc() {
         echo "llvm-ws not set!"
         return
     fi
+    
     if [ -f "$MYLLVMBIN/llc" ]; then
         export LLC=$MYLLVMBIN/llc
-        $MYLLVMWS/llvm/utils/update_llc_test_checks.py --llc-binary $LLC $1
-        echo "Updating with ${LLC}"
+        echo "Using LLC binary: ${LLC}"
+        
+        # Check if arguments are provided
+        if [ $# -eq 0 ]; then
+            echo "No files provided. Usage: update_llc file1.ll file2.ll ..."
+            return
+        fi
+        
+        # Process each argument
+        for file in "$@"; do
+            # Check if file exists
+            if [ ! -f "$file" ]; then
+                echo "File not found: $file"
+                continue
+            fi
+            
+            # Check if file has .ll extension
+            if [[ "$file" != *.ll ]]; then
+                echo "Skipping non-IR file: $file"
+                continue
+            fi
+            
+            echo "Updating $file..."
+            $MYLLVMWS/llvm/utils/update_llc_test_checks.py --llc-binary $LLC "$file"
+        done
     else
-        echo "Not Valid $LLC llc binary!"
+        echo "Not Valid llc binary! $MYLLVMBIN/llc not found."
     fi      
 }
 

@@ -1,5 +1,41 @@
 #! /bin/bash
 
-# lit_clean ll_file prefix1 [prefix2 prefix3 ...]
-# Updated to handle multiple prefixes/tokens
-python3 $GROOT/pyscripts/stringutils_rm_prefix.py "$1" ";" "${@:2}" -o "$1" --del_empty_lines
+# lit_clean ll_file1 [ll_file2 ...] prefix1 [prefix2 prefix3 ...]
+# Usage: lit_clean file1.ll file2.ll ... PREFIX1 [PREFIX2 ...]
+# The script will process each file, removing lines with any of the given prefixes.
+
+if [[ $# -lt 2 ]]; then
+    echo "Usage: $0 ll_file1 [ll_file2 ...] prefix1 [prefix2 ...]"
+    exit 1
+fi
+
+# Find the index of the first prefix (assume all files end with .ll)
+file_args=()
+prefix_args=()
+found_prefixes=false
+
+for arg in "$@"; do
+    if [[ "$arg" == *.ll ]]; then
+        if ! $found_prefixes; then
+            file_args+=("$arg")
+        else
+            prefix_args+=("$arg")
+        fi
+    else
+        found_prefixes=true
+        prefix_args+=("$arg")
+    fi
+done
+
+if [[ ${#file_args[@]} -eq 0 || ${#prefix_args[@]} -eq 0 ]]; then
+    echo "Error: Must specify at least one file (.ll) and one prefix"
+    exit 1
+fi
+
+for ll_file in "${file_args[@]}"; do
+    python3 $GROOT/pyscripts/stringutils_rm_prefix.py "$ll_file" ";" "${prefix_args[@]}" -o "$ll_file" --del_empty_lines
+    if [[ $? -ne 0 ]]; then
+        echo "Error processing file: $ll_file"
+        exit 1
+    fi
+done   

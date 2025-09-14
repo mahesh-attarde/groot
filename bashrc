@@ -125,9 +125,17 @@ ffgtp(){ find . -name $1 | xargs readlink -f ; }
 ## Source Other Scripts
 alias edrc='${MYED} ${GROOT}/bashrc'
 alias ldrc='source ${GROOT}/bashrc'
-alias llrc='source ${GROOT}/llvm.sh'
 alias icsrc='source ${GROOT}/izx.sh'
 alias gtrc='source ${GROOT}/goto/goto.sh'
 alias gitrc='source ${GROOT}/git.sh'
 alias dbrc='source ${GROOT}/compiler_debug.sh'
 alias xisarc='source ${GROOT}/xisa_ws.sh'
+
+# 
+llrc() {
+    source ${GROOT}/llvm.sh;
+    source ${GROOT}/goto/goto.sh;
+    source ${GROOT}/git.sh;
+    source ${GROOT}/compiler_debug.sh;
+    ctx llvm;
+}
