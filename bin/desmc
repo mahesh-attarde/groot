@@ -1,0 +1,14 @@
+#! /bin/bash -v
+# DESCRIBE MACHINE , redirect output to file
+# 
+echo "CPU-PLATFORM FEATURES
+lscpu 
+  
+# CPU FEATURES
+lshw -C cpu | grep -i capabilities
+
+# MEMORY
+lshw -short -C memory
+  
+# OS 
+cat /etc/os-release
