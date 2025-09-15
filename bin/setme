@@ -1,0 +1,5 @@
+#! /bin/bash
+cd $GROOT
+git clone https://github.com/mahesh-attarde/Professor.git
+cp Professor/*py $GROOT/pyscripts
+rm -rf Professor
