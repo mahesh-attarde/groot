@@ -153,7 +153,7 @@ llit() {
         echo "llvm-ws not set!"
         return
     fi
-    $LLVMWSBIN/llvm-lit $LLVMWSWS/llvm/test/${test_prefix} $options &> $MYTEMPDIR/llit.log
+    $LLVMWSBIN/llvm-lit $MYLLVMWS/llvm/test/${test_prefix} $options &> $MYTEMPDIR/llit.log
     code $MYTEMPDIR/llit.log
 }
 
@@ -165,7 +165,7 @@ clit() {
         echo "llvm-ws not set!"
         return
     fi
-    $LLVMWSBIN/llvm-lit $LLVMWSWS/clang/test/${test_prefix} $options &> $MYTEMPDIR/clit.log
+    $LLVMWSBIN/llvm-lit $MYLLVMWS/clang/test/${test_prefix} $options &> $MYTEMPDIR/clit.log
     code $MYTEMPDIR/clit.log
 }
 
