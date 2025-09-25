@@ -1,0 +1,4 @@
+#! /bin/bash
+mkdir -p $1.split
+echo "Logs in $1.split"
+python3 $GROOT/pyscripts/split_printlog.py $1 --out-dir=$1.split

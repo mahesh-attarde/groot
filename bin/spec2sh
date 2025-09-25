@@ -1,2 +1,2 @@
 #! /bin/bash
-python3 $GROOT/pyscripts/spec2sh.py $1
+python3 $GROOT/pyscripts/spec2sh.py "$@"
