@@ -26,3 +26,9 @@ describe_machine(){
 	USAGE=$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage ""}')
 	echo "CPU Usage : $USAGE"
 }
+
+if [ "$0" = "$BASH_SOURCE" ]; then
+
+else
+	describe_machine
+fi
