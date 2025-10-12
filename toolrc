@@ -79,7 +79,7 @@ dlmodernlinux() {
         "duf|https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_x86_64.tar.gz|duf"
         "fd|https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-gnu.tar.gz|fd"
         "rg|https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-unknown-linux-musl.tar.gz|rg"
-
+        "bfs|https://github.com/tavianator/bfs/releases/download/4.1/bfs-4.1.tar.gz|bfs"
     )
     
     for tool_info in "${tools[@]}"; do
