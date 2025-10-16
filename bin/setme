@@ -1,5 +1,11 @@
 #! /bin/bash
 cd $GROOT
-git clone https://github.com/mahesh-attarde/Professor.git
+git clone https://github.com/mahesh-attarde/Professor.git --depth=1
 cp Professor/*py $GROOT/pyscripts
 rm -rf Professor
+
+git clone https://github.com/google/python-fire.git --depth=1
+cd python-fire
+python setup.py install --prefix=$GROOT/pyscripts
+cd ..
+rm -rf python-fire
