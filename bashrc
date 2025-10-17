@@ -10,7 +10,7 @@ export VISUAL=gvim
 export MYED=code
 alias g='gvim'
 # Get Tools from ./bin
-export PATH=$GROOT/bin:$PATH
+export PATH=$GROOT/bin:$GROOT/bin/jira:$GROOT/bin/linux/:$PATH
 
 setvscode() {
     export PATH=${VSCODE_GIT_ASKPASS_NODE%/*}/bin/remote-cli:$PATH

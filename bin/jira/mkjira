@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# mkjira - Create a JIRA project directory structure
+# Usage: mkjira <project_name>
+
+if [[ $# -ne 1 ]]; then
+    echo "Error: Project name is required" >&2
+    echo "Usage: $0 <project_name>" >&2
+    exit 1
+fi
+
+project_name="$1"
+
+# Check if directory already exists
+if [[ -d "$project_name" ]]; then
+    echo "Error: Directory '$project_name' already exists" >&2
+    exit 1
+fi
+
+# Create main project directory
+if ! mkdir "$project_name"; then
+    echo "Error: Failed to create directory '$project_name'" >&2
+    exit 1
+fi
+
+# Change to project directory
+if ! cd "$project_name"; then
+    echo "Error: Failed to change to directory '$project_name'" >&2
+    exit 1
+fi
+
+# Create .jenv directory
+if ! mkdir .jenv; then
+    echo "Error: Failed to create .jenv directory" >&2
+    exit 1
+fi
+
+# Create source script with executable permissions
+if ! cat > .jenv/source.sh << 'EOF'; then
+echo "Environment setup complete"
+EOF
+    echo "Error: Failed to create .jenv/source.sh" >&2
+    exit 1
+fi
+
+# Create notes script
+if ! cat > .jenv/Notes.sh << EOF; then
+echo "Notes for Jira $project_name"
+EOF
+    echo "Error: Failed to create .jenv/Notes.sh" >&2
+    exit 1
+fi
+
+# Make the source script executable (fixed path)
+if ! chmod +x .jenv/source.sh; then
+    echo "Error: Failed to make .jenv/source.sh executable" >&2
+    exit 1
+fi
+
+echo "Created project directory '$project_name' with .jenv/source.sh and .jenv/Notes.sh"

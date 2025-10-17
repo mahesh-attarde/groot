@@ -1,0 +1,4 @@
+#! /bin/bash
+ps -u $(whoami) |  mrg 'node|code*'
+pkill node
+pkill code-*

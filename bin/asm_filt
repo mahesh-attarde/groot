@@ -8,5 +8,6 @@ input_file="${1}"
 # Filter out lines that start with directives (after optional whitespace)
 # Keep labels (.L*) and actual instructions
 grep -vE '^\s*\.(file|text|globl|p2align|type|size|section)' "$input_file" | \
+grep -vE '^\s*\.cfi' | \
 grep -vE '^\s*#' | \
 grep -vE '^\s*$'
