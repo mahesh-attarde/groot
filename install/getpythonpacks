@@ -1,0 +1,4 @@
+#! /bin/bash
+wget https://files.pythonhosted.org/packages/20/16/650289cd3f43d5a2fadfd98c68bd1e1e7f2550a1a5326768cddfbcedb2c5/pip-25.2.tar.gz
+tar -xf pip-25.2.tar.gz
+echo "python3 ./pip-25.2/src/pip/__main__.py  install torch --prefix=$PWD"
