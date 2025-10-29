@@ -59,49 +59,46 @@ lvpf(){
 
 #########################################################
 # Compile 
-
 lvconfig() {
+    config_name=${1:-"default"} 
     env_set=$(llvm_check_ws)
     if [[ "$env_set" != "1" ]]; then
         echo "llvm-ws not set!"
         return
+    fi 
+    config_file="$GROOT/build_config/$config_name"
+    
+    # Check if config file exists
+    if [[ ! -f "$config_file" ]]; then
+        echo "Configuration file not found: $config_file"
+        echo "Available configurations:"
+        if [[ -d "$GROOT/build_config" ]]; then
+            ls "$GROOT/build_config/"
+        else
+            echo "  $GROOT/build_config directory does not exist"
+        fi
+        return
     fi
+    
+    echo "Configuring LLVM with config: $config_name"
+    echo "Using config file: $config_file"
+    
+    # Read configuration options from file
     EXTRA_CONF=""
-    if [[ "$1" == "llvm-exegenis" ]]; then
-      EXTRA_CONF=-DLLVM_ENABLE_LIBPFM=ON 
-    fi
-    echo "Configuring LLVM..."
+    while IFS= read -r line; do
+        # Skip empty lines and comments
+        if [[ -n "$line" && ! "$line" =~ ^[[:space:]]*# ]]; then
+            EXTRA_CONF="$EXTRA_CONF $line"
+        fi
+    done < "$config_file"
+    
     cd $MYLLVMWS
     mkdir -p build 
     cd build
-    cmake -S ../llvm -G Ninja \
-        -DLLVM_TARGETS_TO_BUILD=X86 \
-        -DBUILD_SHARED_LIBS=OFF \
-        -DLLVM_ENABLE_PROJECTS="clang" \
-        -DCMAKE_BUILD_TYPE=Debug \
-        -DLLVM_OPTIMIZED_TABLEGEN=OFF \
-        $EXTRA_CONF \
-        -DCMAKE_INSTALL_PREFIX=$PWD/install
-        
-}
-lvconfig_sp(){
-    env_set=$(llvm_check_ws)
-    if [[ "$env_set" != "1" ]]; then
-        echo "llvm-ws not set!"
-        return
-    fi
-    echo "Configuring LLVM WITH SPECIAL..."
-    cd $MYLLVMWS
-    mkdir -p build 
-    cd build
-    cmake -S ../llvm -G Ninja \
-        -DLLVM_TARGETS_TO_BUILD=X86 \
-        -DBUILD_SHARED_LIBS=OFF \
-        -DLLVM_ENABLE_PROJECTS="clang" \
-        -DCMAKE_BUILD_TYPE=Debug \
-        -DLLVM_OPTIMIZED_TABLEGEN=OFF \
-        -DLLVM_ENABLE_LIBPFM=ON  \
-        -DCMAKE_INSTALL_PREFIX=$PWD/install
+    
+    # Execute cmake with base configuration plus config file options
+    echo cmake $EXTRA_CONF
+    eval "cmake $EXTRA_CONF"
 }
 
 lvb() {

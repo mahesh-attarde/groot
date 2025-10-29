@@ -1,6 +1,6 @@
 # gdb
-alias gdba='gdb -q --args'
-
+alias gdba='gdb -q -x $GROOT/gdb/gdbinit_base -x $GROOT/gdb/gdbinit_custom --args'
+alias lgdb='gdb -q -x $GROOT/gdb/gdbinit_base -x $GROOT/gdb/gdbinit_custom -x $GROOT/gdb/gdbinit_llvm --args'
 # Objdump 
 objdump_func(){
     objdump -d $1
@@ -80,6 +80,7 @@ dlmodernlinux() {
         "fd|https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-gnu.tar.gz|fd"
         "rg|https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-unknown-linux-musl.tar.gz|rg"
         "bfs|https://github.com/tavianator/bfs/releases/download/4.1/bfs-4.1.tar.gz|bfs"
+        "fzf|https://github.com/junegunn/fzf/releases/download/v0.66.0/fzf-0.66.0-linux_amd64.tar.gz|fzf"
     )
     
     for tool_info in "${tools[@]}"; do
