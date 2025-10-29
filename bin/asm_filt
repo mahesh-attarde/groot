@@ -10,4 +10,5 @@ input_file="${1}"
 grep -vE '^\s*\.(file|text|globl|p2align|type|size|section)' "$input_file" | \
 grep -vE '^\s*\.cfi' | \
 grep -vE '^\s*#' | \
+grep -vE '^\s*.\cfi' | \
 grep -vE '^\s*$'
