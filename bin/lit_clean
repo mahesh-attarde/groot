@@ -15,7 +15,7 @@ prefix_args=()
 found_prefixes=false
 
 for arg in "$@"; do
-    if [[ "$arg" == *.ll ]]; then
+    if [[ "$arg" == *.ll || "$arg" == *.cpp || "$arg" == *.c || "$arg" == *.s || "$arg" == *.txt ]]; then
         if ! $found_prefixes; then
             file_args+=("$arg")
         else
