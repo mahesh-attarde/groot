@@ -2,18 +2,29 @@
 """
 Easy driver for tests 
 
-usage: cabbie.py [-h] [-c] [-l] [-r] source_file
+usage: cabbie.py [-h] [-c] [-l] [-r] [-p PREFIX] source_file
 
 positional arguments:
   source_file
 
 options:
-  -h, --help          show this help message and exit
-  -c, --compile-only
-  -l, --link-only
-  -r, --run-only
+  -h, --help            show this help message and exit
+  -c, --compile-only    Only run compile commands
+  -l, --link-only       Only run link commands
+  -r, --run-only        Only run execution commands
+  -p PREFIX, --prefix PREFIX
+                        Run only specific custom command prefixes (comma-separated)
 
 Examples:
+
+Standard workflow (COMPILE, LINK, RUN):
+  python3 cabbie.py test.c
+  python3 cabbie.py -c test.c          # compile only
+  python3 cabbie.py -r test.ll         # run only
+
+Custom command prefix workflow:
+  python3 cabbie.py -p VERIFY test.c   # run only VERIFY commands
+  python3 cabbie.py -p QUICK,SMOKE test.c  # run QUICK and SMOKE commands
 
 C/C++ Example:
 /* COMPILE: gcc -c -o test/gnuasm.o %s \
@@ -21,25 +32,31 @@ C/C++ Example:
    LINK: gcc -o test/gnuasm test/gnuasm.o 
    RUN: ./test/gnuasm \
    1 2 3
+   VERIFY: ./verify_output.sh
+   SMOKE: ./smoke_test.sh
 */
 
 Shell Script Example:
 # COMPILE: echo "Preprocessing shell script"
 # RUN: bash %s
+# QUICK: ./quick_sanity.sh
 
 LLVM IR Example:
 ; COMPILE: llc -filetype=obj %s -o test.o
 ; LINK: clang test.o -o test
 ; RUN: ./test
+; VERIFY: llvm-lit %s
 
 Assembly Example:
 # COMPILE: as -o test.o %s
 # LINK: ld -o test test.o
 # RUN: ./test
+# VALIDATE: objdump -d test
 
 Text/Other Example:
 # RUN: cat %s
 # RUN: python3 process.py %s
+# CHECK: python3 validate.py %s
 
 """
 
@@ -59,6 +76,9 @@ COMMENT_PATTERNS = {
     'text': r'^\s*#\s*',
 }
 
+# Standard command types
+STANDARD_TOKENS = {'COMPILE', 'LINK', 'RUN'}
+
 def detect_file_type(filepath):
     """Auto-detect file type based on extension."""
     ext = os.path.splitext(filepath)[1].lower()
@@ -77,34 +97,46 @@ def detect_file_type(filepath):
     }
     return ext_map.get(ext, 'text')
 
-def parse_commands(filepath):
-    """Parse COMPILE, LINK, RUN commands from source file."""
+def parse_commands(filepath, custom_prefixes=None):
+    """Parse COMPILE, LINK, RUN and custom command prefixes from source file."""
     commands = {'compile': [], 'link': [], 'run': []}
-    known_tokens = {'COMPILE', 'LINK', 'RUN'}
+    
+    # If custom prefixes provided, create entries for them
+    if custom_prefixes:
+        for prefix in custom_prefixes:
+            commands[prefix.lower()] = []
     
     # Detect file type from extension
     file_type = detect_file_type(filepath)
     comment_pattern = COMMENT_PATTERNS.get(file_type, r'^\s*#\s*')
     
+    # Collect all tokens we're looking for
+    all_tokens = set(STANDARD_TOKENS)
+    if custom_prefixes:
+        all_tokens.update(prefix.upper() for prefix in custom_prefixes)
+    
     try:
         with open(filepath, 'r') as f:
             lines = f.readlines()
             
-            # Warn about unknown tokens
-            for i, line in enumerate(lines):
-                # Remove comment prefix
-                cleaned = re.sub(comment_pattern, '', line)
-                m = re.match(r'^([A-Z_]+):\s*(.+)', cleaned)
-                if m:
-                    token = m.group(1).upper()
-                    if token not in known_tokens:
-                        print(f"Warning: Unknown command '{token}' at line {i+1}")
-            
-            # Extract commands
-            for key in commands:
-                pattern = rf'{key.upper()}:\s*(.+)'
+            # Warn about unknown tokens (only if not in custom prefix mode)
+            if not custom_prefixes:
                 for i, line in enumerate(lines):
-                    # Remove comment prefix
+                    cleaned = re.sub(comment_pattern, '', line)
+                    m = re.match(r'^([A-Z_]+):\s*(.+)', cleaned)
+                    if m:
+                        token = m.group(1).upper()
+                        if token not in STANDARD_TOKENS:
+                            print(f"Warning: Unknown command '{token}' at line {i+1}")
+            
+            # Extract commands for all tokens
+            for token in all_tokens:
+                key = token.lower()
+                if key not in commands:
+                    commands[key] = []
+                    
+                pattern = rf'{token}:\s*(.+)'
+                for i, line in enumerate(lines):
                     cleaned = re.sub(comment_pattern, '', line)
                     m = re.search(pattern, cleaned, re.IGNORECASE)
                     if m:
@@ -145,26 +177,44 @@ def main():
                        help='Only run link commands')
     parser.add_argument('-r', '--run-only', action='store_true',
                        help='Only run execution commands')
+    parser.add_argument('-p', '--prefix', type=str,
+                       help='Run only specific custom command prefixes (comma-separated, e.g., VERIFY,SMOKE)')
     args = parser.parse_args()
     
     if not os.path.isfile(args.source_file):
         print(f"Error: File not found: {args.source_file}")
         sys.exit(1)
     
-    cmds = parse_commands(args.source_file)
+    # Parse custom prefixes if provided
+    custom_prefixes = None
+    if args.prefix:
+        custom_prefixes = [prefix.strip().upper() for prefix in args.prefix.split(',')]
+        print(f"Running custom command prefixes: {', '.join(custom_prefixes)}")
     
-    # Execute commands based on options
-    if not args.run_only:
-        for i, cmd in enumerate(cmds['compile']):
-            run_cmd(cmd, 'COMPILE', i)
-            
-    if not args.compile_only and not args.run_only:
-        for i, cmd in enumerate(cmds['link']):
-            run_cmd(cmd, 'LINK', i)
-            
-    if not args.compile_only and not args.link_only:
-        for i, cmd in enumerate(cmds['run']):
-            run_cmd(cmd, 'RUN', i)
+    cmds = parse_commands(args.source_file, custom_prefixes)
+    
+    # If custom prefix mode, only run custom commands
+    if args.prefix:
+        for prefix in custom_prefixes:
+            key = prefix.lower()
+            if key in cmds and cmds[key]:
+                for i, cmd in enumerate(cmds[key]):
+                    run_cmd(cmd, prefix, i)
+            else:
+                print(f"Warning: No commands found for prefix '{prefix}'")
+    else:
+        # Standard mode: run compile, link, run
+        if not args.run_only:
+            for i, cmd in enumerate(cmds['compile']):
+                run_cmd(cmd, 'COMPILE', i)
+                
+        if not args.compile_only and not args.run_only:
+            for i, cmd in enumerate(cmds['link']):
+                run_cmd(cmd, 'LINK', i)
+                
+        if not args.compile_only and not args.link_only:
+            for i, cmd in enumerate(cmds['run']):
+                run_cmd(cmd, 'RUN', i)
 
 if __name__ == '__main__':
     main()
