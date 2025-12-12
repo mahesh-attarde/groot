@@ -1,0 +1,2 @@
+#! /bin/bash 
+python -c "import sysconfig; print(sysconfig.get_path('$1'))"
