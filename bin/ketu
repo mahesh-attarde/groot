@@ -1,0 +1,6 @@
+#! /bin/bash
+if [[ $# -lt 1 ]]; then
+    echo "Usage: $0 commands file -options"
+    exit 
+fi
+python3 $GROOT/pyscripts/parallel_exec.py "$@"
