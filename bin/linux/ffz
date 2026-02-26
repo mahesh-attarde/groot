@@ -1,0 +1,2 @@
+#! /bin/bash
+fzf --height=40% --layout=reverse --info=inline --border --margin=1 --padding=1 | xargs code
