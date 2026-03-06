@@ -1,7 +1,7 @@
 #! /bin/bash -v
 # DESCRIBE MACHINE , redirect output to file
 # 
-echo "CPU-PLATFORM FEATURES
+echo "CPU-PLATFORM FEATURES"
 lscpu 
   
 # CPU FEATURES
