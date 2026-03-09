@@ -19,13 +19,13 @@ TARGET_FILE="$2"
 # Check if the replacement file exists
 if [[ ! -f "$REPLACEMENT_FILE" ]]; then
   echo "Replacement file $REPLACEMENT_FILE does not exist."
-  exit 1
+  return
 fi
 
 # Check if the target file exists
 if [[ ! -f "$TARGET_FILE" ]]; then
   echo "Target file $TARGET_FILE does not exist."
-  exit 1
+  return
 fi
 
 # Read each line from the replacement file
