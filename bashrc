@@ -6,6 +6,8 @@ source ${GROOT}/color.sh
 source ${GROOT}/toolrc
 # For Git functions
 source ${GROOT}/git.sh
+# For LLVM Commands
+source ${GROOT}/llvm.sh;
 
 # Setup symlinks to groot config files
 if [ ! -L ~/.vimrc ] || [ "$(readlink ~/.vimrc)" != "${GROOT}/vimrc" ]; then
