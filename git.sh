@@ -72,6 +72,11 @@ git_search_in_branches() {
     git rev-list --all | xargs git grep -F $key
 }
 
+# Git find first occurence of string
+git_search_first_occ() {
+git log -S $1 --reverse --oneline
+}
+
 ## Git search commit for user
 # git  log --author="Mahesh Attarde" --since="2018-01-01"  --grep="Supports" --oneline
 git_search_grep_user() {
