@@ -1,16 +1,31 @@
 #! /bin/bash
-if [[ $# -lt 1 ]]; then
-    echo "Usage: $0 file1 [file2 ...] "
+options=()
+file_args=()
+skip_next=false
+
+for arg in "$@"; do
+    if $skip_next; then
+        options+=("$arg")
+        skip_next=false
+    elif [[ "$arg" == "-p" || "$arg" == "--prefix" ]]; then
+        options+=("$arg")
+        skip_next=true
+    elif [[ "$arg" == -* ]]; then
+        options+=("$arg")
+    else
+        file_args+=("$arg")
+    fi
+done
+
+if [[ ${#file_args[@]} -lt 1 ]]; then
+    echo "Usage: $0 [options] file1 [file2 ...] "
     exit 1
 fi
-file_args=()
-for arg in "$@"; do
- file_args+=("$arg")
-done
+
 for ll_file in "${file_args[@]}"; do
-    python3 $GROOT/pyscripts/cabbie.py "$ll_file"
+    python3 $GROOT/pyscripts/cabbie.py "${options[@]}" "$ll_file"
     if [[ $? -ne 0 ]]; then
         echo "[CABBIE RUN FAIL]: $ll_file"
-        exit 
+        exit 1
     fi
-done 
+done
