@@ -4,6 +4,19 @@ source ${GROOT}/grootrc
 source ${GROOT}/color.sh
 # For Binutils and other tools
 source ${GROOT}/toolrc
+# For Git functions
+source ${GROOT}/git.sh
+# For LLVM Commands
+source ${GROOT}/llvm.sh;
+
+# Setup symlinks to groot config files
+if [ ! -L ~/.vimrc ] || [ "$(readlink ~/.vimrc)" != "${GROOT}/vimrc" ]; then
+    ln -sf ${GROOT}/vimrc ~/.vimrc
+fi
+if [ ! -L ~/.tmux.conf ] || [ "$(readlink ~/.tmux.conf)" != "${GROOT}/tmux.conf" ]; then
+    ln -sf ${GROOT}/tmux.conf ~/.tmux.conf
+fi
+
 # Set the default editor
 export EDITOR=vim
 export VISUAL=gvim

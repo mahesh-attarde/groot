@@ -23,7 +23,7 @@ if [ "$color_prompt" = yes ]; then
     # when used as root, change username to orange and '#' to red for prompt
     if [ $(id -u) -eq 0 ]; then usercol="\[\033[38;5;3m\]"; hashcol="\[\033[38;5;1m\]"; else usercol="\[\033[38;5;2m\]"; fi
     # bash PS1 prompt. $(realpath .) instead of \w avoids symlink paths
-    PS1="${usercol}\u\[$(tput sgr0)\]@\[$(tput sgr0)\]\[\033[38;5;4m\]${sshbg}\h\[$(tput sgr0)\]:[$ICS_WSNAME]\[$(tput sgr0)\]\[\033[38;5;6m\]\w\[$(tput sgr0)\]${hashcol}\\$ \[$(tput sgr0)\] \n"
+    PS1="${usercol}\u\[$(tput sgr0)\]@\[$(tput sgr0)\]\[\033[38;5;4m\]${sshbg}\h\[$(tput sgr0)\]:[$ICS_WSNAME]\[$(tput sgr0)\]\[\033[38;5;6m\]\w\[$(tput sgr0)\]${hashcol}\\$ \[$(tput sgr0)\] \n$ "
     unset sshbg rootcol hashcol
 fi
 unset color_prompt force_color_prompt
