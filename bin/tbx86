@@ -1,0 +1,16 @@
+#! /bin/bash
+#build/bin/llvm-tblgen \
+#  -I llvm/include \
+#  -I llvm/lib/Target/X86 \
+#  -gen-x86-inst-patterns \
+#  -inst-record=BLEND,BROADCAST,UNPACK \
+#  llvm/lib/Target/X86/X86.td \
+#  -o  all.out
+
+tool=llvm-tblgen
+if ! command -v $tool &> /dev/null; then
+    echo "Error: '$tool' tool not found in PATH"
+    echo "Please ensure LLVM is installed and $tool is in your PATH"
+fi
+echo "Using Tool From: $(which $tool)"
+$tool -I llvm/include -I llvm/lib/Target/X86 llvm/lib/Target/X86/X86.td "${@:1}"

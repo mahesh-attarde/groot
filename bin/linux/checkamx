@@ -1,0 +1,3 @@
+#! /bin/bash
+lscpu | egrep -iq 'amx' || { echo "AMX not supported on this CPU"; return; }
+echo "AMX supported on this CPU"
