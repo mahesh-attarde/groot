@@ -126,8 +126,8 @@ def parse_commands(filepath, custom_prefixes=None):
                     m = re.match(r'^([A-Z_]+):\s*(.+)', cleaned)
                     if m:
                         token = m.group(1).upper()
-                        if token not in STANDARD_TOKENS:
-                            print(f"Warning: Unknown command '{token}' at line {i+1}")
+                        if token not in STANDARD_TOKENS and verbose:
+                            print(f"Warning: Skipping custom command '{token}' at line {i+1}")
             
             # Extract commands for all tokens
             for token in all_tokens:
@@ -179,7 +179,12 @@ def main():
                        help='Only run execution commands')
     parser.add_argument('-p', '--prefix', type=str,
                        help='Run only specific custom command prefixes (comma-separated, e.g., VERIFY,SMOKE)')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                       help='Enable verbose logging')
     args = parser.parse_args()
+    
+    global verbose
+    verbose = args.verbose
     
     if not os.path.isfile(args.source_file):
         print(f"Error: File not found: {args.source_file}")

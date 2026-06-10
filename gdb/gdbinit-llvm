@@ -1,0 +1,6 @@
+define dptr
+  call $arg0->dump()
+end
+define dref
+  call $arg0.dump()
+end

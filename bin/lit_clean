@@ -29,13 +29,13 @@ done
 
 if [[ ${#file_args[@]} -eq 0 || ${#prefix_args[@]} -eq 0 ]]; then
     echo "Error: Must specify at least one file (.ll) and one prefix"
-    exit 1
+    return
 fi
 
 for ll_file in "${file_args[@]}"; do
     python3 $GROOT/pyscripts/stringutils_rm_prefix.py "$ll_file" ";" "${prefix_args[@]}" -o "$ll_file" --del_empty_lines
     if [[ $? -ne 0 ]]; then
         echo "Error processing file: $ll_file"
-        exit 1
+        return
     fi
 done   
