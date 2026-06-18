@@ -1,0 +1,34 @@
+#!/bin/bash
+
+branch=$1
+
+if [[ -z "$branch" ]]; then
+    branch=$(git rev-parse --abbrev-ref HEAD)
+    echo -e "\033[1;34m[GIT]\033[0m No branch specified, using current: $branch"
+fi
+
+remotes=($(git remote))
+
+if [[ ${#remotes[@]} -eq 0 ]]; then
+    echo -e "\033[1;34m[GIT]\033[0m No remotes configured."
+    exit 1
+elif [[ ${#remotes[@]} -eq 1 ]]; then
+    remote="${remotes[0]}"
+else
+    echo -e "\033[1;34m[GIT]\033[0m Multiple remotes found:"
+    for i in "${!remotes[@]}"; do
+        url=$(git remote get-url "${remotes[$i]}")
+        echo "  [$i] ${remotes[$i]} ($url)"
+    done
+    read -rp "Select remote [0-$((${#remotes[@]}-1))]: " choice
+    remote="${remotes[$choice]}"
+    if [[ -z "$remote" ]]; then
+        echo -e "\033[1;34m[GIT]\033[0m Invalid selection."
+        exit 1
+    fi
+fi
+
+echo -e "\033[1;34m[GIT]\033[0m Pushing $branch to $remote..."
+git push -u "$remote" "$branch"
+
+
