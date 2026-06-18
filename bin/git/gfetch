@@ -1,4 +1,4 @@
 #! /bin/bash
-echo -e "\033[1;34m[GIT]\033[0m Fetching..."
-git fetch
-
+source "$(dirname "$0")/.gitrc"
+echo -e "$GIT_TAG Fetching..."
+git fetch && echo -e "$GIT_TAG_OK Fetch complete." || echo -e "$GIT_TAG_ERR Fetch failed."

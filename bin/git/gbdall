@@ -1,6 +1,6 @@
 #! /bin/bash
-echo "Deleting all branches except main, master and topic"
+source "$(dirname "$0")/.gitrc"
+echo -e "$GIT_TAG_ERR Deleting all branches except topic..."
 git checkout topic
 git branch | grep -vE 'topic' | xargs git branch -D
-
-
+echo -e "$GIT_TAG_OK Done."

@@ -1,4 +1,4 @@
 #! /bin/bash
-echo -e "\033[1;34m[GIT]\033[0m COMMIT..."
-git commit -m $1
-
+source "$(dirname "$0")/.gitrc"
+echo -e "$GIT_TAG Committing..."
+git commit -m "$1" && echo -e "$GIT_TAG_OK Committed." || echo -e "$GIT_TAG_ERR Commit failed."

@@ -1,3 +1,4 @@
 #! /bin/bash
-echo -e "\033[1;34m[GIT]\033[0m Popping changes..."
-git stash pop
+source "$(dirname "$0")/.gitrc"
+echo -e "$GIT_TAG Popping changes..."
+git stash pop && echo -e "$GIT_TAG_OK Stash applied." || echo -e "$GIT_TAG_ERR Stash pop failed."

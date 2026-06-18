@@ -1,4 +1,4 @@
 #! /bin/bash
-echo -e "\033[1;34m[GIT]\033[0m Stashing changes..."
-git stash save
-
+source "$(dirname "$0")/.gitrc"
+echo -e "$GIT_TAG Stashing changes..."
+git stash save && echo -e "$GIT_TAG_OK Stashed." || echo -e "$GIT_TAG_ERR Stash failed."

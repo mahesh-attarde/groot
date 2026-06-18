@@ -1,0 +1,4 @@
+#! /bin/bash
+source "$(dirname "$0")/.gitrc"
+echo -e "$GIT_TAG Log..."
+git log --oneline --graph -20

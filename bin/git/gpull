@@ -1,0 +1,4 @@
+#! /bin/bash
+source "$(dirname "$0")/.gitrc"
+echo -e "$GIT_TAG Pulling..."
+git pull && echo -e "$GIT_TAG_OK Pull complete." || echo -e "$GIT_TAG_ERR Pull failed."

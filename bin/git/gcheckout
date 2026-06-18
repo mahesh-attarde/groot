@@ -1,2 +1,4 @@
 #! /bin/bash
-git checkout $1
+source "$(dirname "$0")/.gitrc"
+echo -e "$GIT_TAG Checking out $1..."
+git checkout $1 && echo -e "$GIT_TAG_OK On branch $1" || echo -e "$GIT_TAG_ERR Checkout failed."

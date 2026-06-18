@@ -1,21 +1,22 @@
 #!/bin/bash
+source "$(dirname "$0")/.gitrc"
 
 branch=$1
 
 if [[ -z "$branch" ]]; then
     branch=$(git rev-parse --abbrev-ref HEAD)
-    echo -e "\033[1;34m[GIT]\033[0m No branch specified, using current: $branch"
+    echo -e "$GIT_TAG No branch specified, using current: $branch"
 fi
 
 remotes=($(git remote))
 
 if [[ ${#remotes[@]} -eq 0 ]]; then
-    echo -e "\033[1;34m[GIT]\033[0m No remotes configured."
+    echo -e "$GIT_TAG_ERR No remotes configured."
     exit 1
 elif [[ ${#remotes[@]} -eq 1 ]]; then
     remote="${remotes[0]}"
 else
-    echo -e "\033[1;34m[GIT]\033[0m Multiple remotes found:"
+    echo -e "$GIT_TAG Multiple remotes found:"
     for i in "${!remotes[@]}"; do
         url=$(git remote get-url "${remotes[$i]}")
         echo "  [$i] ${remotes[$i]} ($url)"
@@ -23,12 +24,10 @@ else
     read -rp "Select remote [0-$((${#remotes[@]}-1))]: " choice
     remote="${remotes[$choice]}"
     if [[ -z "$remote" ]]; then
-        echo -e "\033[1;34m[GIT]\033[0m Invalid selection."
+        echo -e "$GIT_TAG_ERR Invalid selection."
         exit 1
     fi
 fi
 
-echo -e "\033[1;34m[GIT]\033[0m Pushing $branch to $remote..."
-git push -u "$remote" "$branch"
-
-
+echo -e "$GIT_TAG Pushing $branch to $remote..."
+git push -u "$remote" "$branch" && echo -e "$GIT_TAG_OK Pushed." || echo -e "$GIT_TAG_ERR Push failed."
