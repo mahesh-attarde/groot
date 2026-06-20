@@ -1,212 +1,213 @@
-#! /bin/bash
+#!/bin/bash
 
-export DEV_REMOTE=https://github.com/mahesh-attarde/llvm-project.git
-export LLVM_REMOTE=https://github.com/llvm/llvm-project.git
-export MYTEMPDIR=/iusers/mattarde/temp
+#===========  Useful commands ===========================
 
-#########################################################
-# SET WS FOR LLVM
-llvmws(){
-  export MYLLVMWS=$PWD
-  export MYLLVMBIN=$MYLLVMWS/build/bin/
-  export LLVMWSBIN=$MYLLVMBIN
-  export LLVMWSWS=$MYLLVMWS/llvm
-  export PATH=$MYLLVMBIN:$PATH
-  mkdir -p $MYTEMPDIR
+git config --global grep.extendRegexp true
+git config --global grep.lineNumber true
+
+alias setrepo='gh repo set-default'
+alias gg='git grep'
+alias gga='git grep --break --heading --line-number'
+alias wd='python3 -m http.server -d $PWD'
+alias ff='find . -name'
+alias drf='gh pr create --draft'
+
+#========================================================
+
+# Global variable for project directory
+PROJ=""
+
+bllvm() {
+  # Set PROJ to current directory
+  PROJ=$(pwd)
+
+  # Prompt the user for the build type at the beginning
+  echo "Enter the build type (e.g., Deb, Rel):"
+  read build_type
+
+  # Validate build type early
+  if [ "$build_type" != "Deb" ] && [ "$build_type" != "Rel" ]; then
+    echo "Invalid build type specified. Please enter either 'Deb' or 'Rel'."
+    return 1
+  fi
+
+  # Check if llvm-project directory already exists
+  if [ -d "llvm-project" ]; then
+    echo "llvm-project directory already exists. Skipping clone."
+  else
+    echo "Cloning llvm-project repository..."
+    git clone https://github.com/JaydeepChauhan14/llvm-project.git
+  fi
+
+  mkdir -p Build
+  cd Build
+
+  # Run the appropriate cmake command based on build type
+  if [ "$build_type" == "Deb" ]; then
+    echo "Configuring Debug build..."
+    cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=$(which clang) -DCMAKE_CXX_COMPILER=$(which clang++) -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_USE_SPLIT_DWARF=ON -DLLVM_ENABLE_ASSERTIONS=ON -DBUILD_SHARED_LIBS=On -DCMAKE_LINKER=lld ../llvm-project/llvm
+  elif [ "$build_type" == "Rel" ]; then
+    echo "Configuring Release build..."
+    cmake -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=$(which clang) -DCMAKE_CXX_COMPILER=$(which clang++) -DLLVM_ENABLE_ASSERTIONS=ON -DBUILD_SHARED_LIBS=On -DCMAKE_LINKER=lld ../llvm-project/llvm
+  fi
+
+  make -j128
+
+  export BINDIR=$(readlink -f bin)
+  echo "Setting up clang in PATH"
+  export PATH=$BINDIR:$PATH
+  echo "Clang path set up"
+
+  # Return to project directory
+  cd "$PROJ"
 }
 
-alias cdws='cd $MYLLVMWS'
-alias cdll='cd ${MYLLVMWS}/llvm/'
-alias cd86='cd ${MYLLVMWS}/llvm/lib/Target/X86/'
+rllvm() {
+  # Check if PROJ is set
+  if [ -z "$PROJ" ]; then
+    echo "PROJ variable not set. Please run bllvm first or set PROJ manually."
+    return 1
+  fi
 
-llvm_check_ws(){
-    if [[ -z "${MYLLVMWS}" ]]; then
-        echo 0
-    fi
-    echo 1
-}
-#########################################################
+  # Navigate to build directory
+  if cd "$PROJ/Build" 2>/dev/null; then
+    echo "Entered build directory: $(pwd)"
+  else
+    echo "No build directory present at $PROJ/Build"
+    return 1
+  fi
 
-# Clone 
-lvclone(){
- git clone  $LLVM_REMOTE $1
-}
+  # Execute the build command
+  make -j128
+  if [ $? -eq 0 ]; then
+    echo "Build successful"
+  else
+    echo "Build failed"
+    cd "$PROJ/llvm-project"
+    return 1
+  fi
 
-# Add Remote
-lvaddremote(){
-     git remote add upstream $DEV_REMOTE
-}
-# Sync Remote
-
-# push branch to fork
-lvpushbr(){
-    git push -u upstream $1 
-}
-# Rebase
-lvfr(){
-    branch=main
-    remote=upstream
-    if [ -z "$1" ]; then
-        echo "Fetch and Rebasing ${remote}/${branch}" 
-    fi
-    git fetch $remote && git rebase -i $remote/$branch
+  cd "$PROJ/llvm-project"
 }
 
-# We can only push to own forks
-lvpf(){
-    git push upstream $1 --force
+sllvm() {
+  # Check if PROJ is set
+  if [ -z "$PROJ" ]; then
+    echo "PROJ variable not set. Please run bllvm first or set PROJ manually."
+    return 1
+  fi
+
+  if cd "$PROJ/Build" 2>/dev/null; then
+    echo "Entered build directory: $(pwd)"
+  else
+    echo "No build directory present at $PROJ/Build"
+    return 1
+  fi
+
+  export BINDIR=$(readlink -f bin)
+  echo "Setting up clang in PATH"
+  export PATH=$BINDIR:$PATH
+  echo "Clang path set up"
+
+  # Return to the project directory
+  cd "$PROJ"
 }
 
-#########################################################
-# Compile 
-lvconfig() {
-    config_name=${1:-"default"} 
-    env_set=$(llvm_check_ws)
-    if [[ "$env_set" != "1" ]]; then
-        echo "llvm-ws not set!"
-        return
-    fi 
-    config_file="$GROOT/build_config/$config_name"
-    
-    # Check if config file exists
-    if [[ ! -f "$config_file" ]]; then
-        echo "Configuration file not found: $config_file"
-        echo "Available configurations:"
-        if [[ -d "$GROOT/build_config" ]]; then
-            ls "$GROOT/build_config/"
-        else
-            echo "  $GROOT/build_config directory does not exist"
-        fi
-        return
-    fi
-    
-    echo "Configuring LLVM with config: $config_name"
-    echo "Using config file: $config_file"
-    
-    # Read configuration options from file
-    EXTRA_CONF=""
-    while IFS= read -r line; do
-        # Skip empty lines and comments
-        if [[ -n "$line" && ! "$line" =~ ^[[:space:]]*# ]]; then
-            EXTRA_CONF="$EXTRA_CONF $line"
-        fi
-    done < "$config_file"
-    
-    cd $MYLLVMWS
-    mkdir -p build 
-    cd build
-    
-    # Execute cmake with base configuration plus config file options
-    echo cmake $EXTRA_CONF
-    eval "cmake $EXTRA_CONF"
+cllvmall() {
+  # Check if PROJ is set
+  if [ -z "$PROJ" ]; then
+    echo "PROJ variable not set. Please run bllvm first or set PROJ manually."
+    return 1
+  fi
+
+  # Navigate to build directory
+  if cd "$PROJ/Build" 2>/dev/null; then
+    echo "Running check-all in: $(pwd)"
+    make check-all -j128 2>&1 | tee "$PROJ/checkall.log"
+    cd -
+  else
+    echo "No build directory present at $PROJ/Build"
+    cd -
+  fi
 }
 
-lvb() {
-    env_set=$(llvm_check_ws)
-    if [[ "$env_set" != "1" ]]; then
-        echo "llvm-ws not set!"
-        return
-    fi
-    echo "Building LLVM..."
-    cd $MYLLVMWS/build
-    ninja
+cclang() {
+  # Check if PROJ is set
+  if [ -z "$PROJ" ]; then
+    echo "PROJ variable not set. Please run bllvm first or set PROJ manually."
+    return 1
+  fi
+
+  # Navigate to build directory
+  if cd "$PROJ/Build" 2>/dev/null; then
+    echo "Running check-clang in: $(pwd)"
+    make check-clang -j128 2>&1 | tee "$PROJ/checkclang.log"
+    cd -
+  else
+    echo "No build directory present at $PROJ/Build"
+    cd -
+  fi
 }
 
-lvcc() {
-    env_set=$(llvm_check_ws)
-    if [[ "$env_set" != "1" ]]; then
-        echo "llvm-ws not set!"
-        return
-    fi
-    cd $MYLLVMWS/build
-    ninja check-clang
+cllvm() {
+  # Check if PROJ is set
+  if [ -z "$PROJ" ]; then
+    echo "PROJ variable not set. Please run bllvm first or set PROJ manually."
+    return 1
+  fi
+
+  # Navigate to build directory
+  if cd "$PROJ/Build" 2>/dev/null; then
+    echo "Running check-llvm in: $(pwd)"
+    make check-llvm -j128 2>&1 | tee "$PROJ/checkllvm.log"
+    cd -
+  else
+    echo "No build directory present at $PROJ/Build"
+    cd -
+  fi
 }
 
-lvcl() {
-    env_set=$(llvm_check_ws)
-    if [[ "$env_set" != "1" ]]; then
-        echo "llvm-ws not set!"
-        return
-    fi
-    cd $MYLLVMWS/build
-    ninja check-llvm
+cformat() {
+  # Check if PROJ is set
+  if [ -z "$PROJ" ]; then
+    echo "PROJ variable not set. Please run bllvm first or set PROJ manually."
+    return 1
+  fi
+
+  # Check if clang-format binary exists
+  if [ ! -f "$PROJ/Build/bin/clang-format" ]; then
+    echo "clang-format binary not found at $PROJ/Build/bin/clang-format"
+    echo "Please ensure LLVM is built with clang-format."
+    return 1
+  fi
+
+  # Check if git-clang-format script exists
+  if [ ! -f "$PROJ/llvm-project/clang/tools/clang-format/git-clang-format" ]; then
+    echo "git-clang-format script not found at $PROJ/llvm-project/clang/tools/clang-format/git-clang-format"
+    return 1
+  fi
+
+  echo "Running git-clang-format with binary: $PROJ/Build/bin/clang-format"
+  "$PROJ/llvm-project/clang/tools/clang-format/git-clang-format" HEAD --binary="$PROJ/Build/bin/clang-format"
 }
 
-lvmkclean() {
-    env_set=$(llvm_check_ws)
-    if [[ "$env_set" != "1" ]]; then
-        echo "llvm-ws not set!"
-        return
-    fi
-    cd $MYLLVMWS/build
-    ninja clean
-}
-# Testing
-llit() {
-    test_prefix=$1
-    options=$2    
-    env_set=$(llvm_check_ws)
-    if [[ "$env_set" != "1" ]]; then
-        echo "llvm-ws not set!"
-        return
-    fi
-    $LLVMWSBIN/llvm-lit $MYLLVMWS/llvm/test/${test_prefix} $options &> $MYTEMPDIR/llit.log
-    code $MYTEMPDIR/llit.log
+sproj() {
+  # Function to manually set PROJ variable
+  PROJ=$(pwd)
+  echo "PROJ set to: $PROJ"
+  sllvm
 }
 
-clit() {
-    test_prefix=$1
-    options=$2    
-    env_set=$(llvm_check_ws)
-    if [[ "$env_set" != "1" ]]; then
-        echo "llvm-ws not set!"
-        return
-    fi
-    $LLVMWSBIN/llvm-lit $MYLLVMWS/clang/test/${test_prefix} $options &> $MYTEMPDIR/clit.log
-    code $MYTEMPDIR/clit.log
+llvmcmd() {
+  echo "Available commands:"
+  echo "  bllvm         -> Build llvm source"
+  echo "  rllvm         -> ReBuild llvm source"
+  echo "  sllvm         -> Set build compiler"
+  echo "  cllvmall      -> Run make check for check-all"
+  echo "  cclang        -> Run make check for check-clang"
+  echo "  cllvm         -> Run make check for check-llvm"
+  echo "  cformat       -> Run git-clang-format with built clang-format binary"
+  echo "  sproj         -> Set PROJ variable to current directory"
+  echo ""
+  echo "Current PROJ: ${PROJ:-'Not set'}"
 }
-
-lvformat() {
- $MYLLVMWS/clang/tools/clang-format/git-clang-format --binary=$MYLLVMBIN/clang-format HEAD
-}
-
-# Update Test
-update_llc() {
-    env_set=$(llvm_check_ws)
-    if [[ "$env_set" != "1" ]]; then
-        echo "llvm-ws not set!"
-        return
-    fi
-    
-    if [ -f "$MYLLVMBIN/llc" ]; then
-        export LLC=$MYLLVMBIN/llc
-        echo "Using LLC binary: ${LLC}"
-        
-        # Check if arguments are provided
-        if [ $# -eq 0 ]; then
-            echo "No files provided. Usage: update_llc file1.ll file2.ll ..."
-            return
-        fi
-        
-        # Process each argument
-        for file in "$@"; do
-            # Check if file exists
-            if [ ! -f "$file" ]; then
-                echo "File not found: $file"
-                continue
-            fi
-            
-            # Check if file has .ll extension
-            if [[ "$file" != *.ll ]]; then
-                echo "Skipping non-IR file: $file"
-                continue
-            fi
-            
-            echo "Updating $file..."
-            $MYLLVMWS/llvm/utils/update_llc_test_checks.py --llc-binary $LLC "$file"
-        done
-    else
-        echo "Not Valid llc binary! $MYLLVMBIN/llc not found."
-    fi      
-}
-
